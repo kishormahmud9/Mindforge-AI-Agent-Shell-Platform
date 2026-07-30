@@ -1,0 +1,107 @@
+# =============================================================================
+# docker-compose.dev.yml
+# Jaysea AI-Agent Shell Platform - Development Overlay
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# Features:
+#   - Source code bind-mounts for hot reload
+#   - Exposes all service ports for direct access
+#   - Disabled auth for PostgreSQL
+#   - Node debug port exposed
+# =============================================================================
+
+version: "3.9"
+
+services:
+
+  # ===========================================================================
+  # PostgreSQL - expose port for local DB tools
+  # ===========================================================================
+  db:
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_USER: jaysea
+      POSTGRES_DB: jaysea_db
+
+  # ===========================================================================
+  # Redis - expose port for local inspection (RedisInsight etc.)
+  # ===========================================================================
+  redis:
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+
+  # ===========================================================================
+  # Backend - bind mount source + nodemon + debug port
+  # ===========================================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: base
+    image: jaysea/backend:dev
+    command: npx nodemon src/server.js
+    environment:
+      NODE_ENV: development
+      PORT: 8001
+      DATABASE_URL: postgresql://jaysea:devpassword@db:5432/jaysea_db?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_EXPIRES_IN: 1d
+      JWT_REFRESH_EXPIRES_IN: 30d
+      AI_URL: http://ai-service:8002
+      BACKEND_URL: http://localhost:8001
+      FRONT_END_URL: http://localhost:3000
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/prisma:/app/prisma
+    ports:
+      - "8001:8001"
+      - "9229:9229"   # Node.js inspector port
+
+  # ===========================================================================
+  # AI Service - bind mount + auto-reload with uvicorn
+  # ===========================================================================
+  ai-service:
+    build:
+      context: ./ai-codebase
+      dockerfile: Dockerfile
+      target: builder
+    image: jaysea/ai-service:dev
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8002 --reload
+    environment:
+      BACKEND_API_URL: http://backend:8001
+    volumes:
+      - ./ai-codebase:/app
+    ports:
+      - "8002:8002"
+
+  # ===========================================================================
+  # Frontend - bind mount for hot module replacement
+  # ===========================================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: deps
+    image: jaysea/frontend:dev
+    command: npm run dev
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:8001/api
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    ports:
+      - "3000:3000"
+
+  # ===========================================================================
+  # Nginx - optional in dev (services expose ports directly)
+  # Comment out nginx in dev if not needed
+  # ===========================================================================
+  nginx:
+    ports:
+      - "80:80"

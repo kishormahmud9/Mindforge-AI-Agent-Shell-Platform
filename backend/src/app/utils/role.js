@@ -1,0 +1,6 @@
+export const Role = {
+  SYSTEM_OWNER: "SYSTEM_OWNER",
+  BUSINESS_OWNER: "BUSINESS_OWNER",
+  ADMIN: "ADMIN",
+  USER: "USER",
+};

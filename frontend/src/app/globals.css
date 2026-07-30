@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Outfit', sans-serif;
+  --color-primary: #10a37f;
+  --color-primary-hover: #14b88e;
+  --color-bg: #09090b;
+  --color-surface: rgba(255, 255, 255, 0.03);
+  --color-text: #fafafa;
+  --color-text-muted: #a1a1aa;
+  --color-secondary: #0ea5e9;
+}
+
+@layer base {
+  :root {
+    --primary: #10a37f;
+    --primary-hover: #14b88e;
+    --bg: #09090b;
+    --text: #fafafa;
+    --text-muted: #a1a1aa;
+  }
+
+  * {
+    @apply box-border m-0 p-0 selection:bg-primary/30;
+  }
+
+  body {
+    @apply bg-bg text-text min-h-screen font-sans antialiased overflow-x-hidden;
+    background-image: 
+      radial-gradient(circle at 0% 0%, rgba(16, 163, 127, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 100% 100%, rgba(16, 163, 127, 0.05) 0%, transparent 40%);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight font-semibold;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/[0.03] backdrop-blur-3xl border border-white/[0.06] rounded-3xl;
+    box-shadow: 
+      0 32px 64px -16px rgba(0,0,0,0.5),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  }
+
+  .glass-dropdown {
+    @apply bg-[#0c0c0e]/95 backdrop-blur-3xl border border-white/[0.1] rounded-2xl overflow-hidden;
+    box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+  }
+
+  .model-badge {
+    @apply flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-bold text-primary uppercase tracking-widest hover:bg-primary/20 transition-all active:scale-95;
+  }
+
+  .btn {
+    @apply px-5 py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed text-sm;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-hover hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary/20;
+  }
+
+  .input-group {
+    @apply mb-5;
+  }
+
+  .input-label {
+    @apply block mb-1.5 text-text-muted text-xs font-medium uppercase tracking-wider;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-white text-sm outline-none focus:border-primary/40 focus:bg-white/[0.05] transition-all duration-300;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-1;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+  }
+}
+
+.loading-spinner {
+  @apply w-5 h-5 border-2 border-white/10 rounded-full border-t-primary animate-spin;
+}
+
+/* Autofill Fix */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #ffffff !important;
+  transition: background-color 5000s ease-in-out 0s;
+  box-shadow: inset 0 0 20px 20px rgba(255, 255, 255, 0.01);
+}
+
+/* Interactivity & Markdown Styles */
+button, 
+[role="button"], 
+.cursor-pointer,
+.model-badge,
+a {
+  cursor: pointer !important;
+}
+
+.markdown-content strong,
+.markdown-content b {
+  font-weight: 700 !important;
+  color: #10a37f !important; /* Use hex to be safe */
+}
+
+.markdown-content em,
+.markdown-content i {
+  font-style: italic !important;
+  opacity: 0.8;
+}
+
+.markdown-content code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.85em;
+  color: #10a37f;
+}
+
+.markdown-content p {
+  margin-bottom: 0.75rem;
+}
+
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}

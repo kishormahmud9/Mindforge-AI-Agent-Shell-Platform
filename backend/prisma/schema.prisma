@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SYSTEM_OWNER   @map("system_owner")
+  BUSINESS_OWNER @map("business_owner")
+  ADMIN          @map("admin")
+  USER           @map("user")
+  ASSISTANT      @map("assistant")
+}
+
+enum OAuthProvider {
+  email
+  google
+  facebook
+  apple
+}
+
+model User {
+  id                   String        @id @default(uuid())
+  name                 String
+  email                String        @unique
+  passwordHash         String?
+  avatarUrl            String?
+  avatarUrlPath        String?
+  role                 UserRole      @default(USER)
+  language             String?
+  designation          String?
+  isVerified           Boolean       @default(false)
+  oauthProvider        OAuthProvider @default(email)
+  oauthProviderId      String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  forgotPasswordStatus Boolean       @default(false)
+
+  instances   Instance[]
+  agents      Agent[]
+  experiences Experience[]
+
+  @@index([role])
+}
+
+// Auth Model Ends Here
+
+model Agent {
+  id        String   @id @default(uuid())
+  agentName String
+  identity  String
+  behavior  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  instances   Instance[]
+  experiences Experience[]
+
+  @@index([userId])
+}
+
+// Agent Model Ends Here
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+model Instance {
+  id        String   @id @default(uuid())
+  name      String?
+  createdAt DateTime @default(now())
+
+  agentId String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  userRole UserRole?
+
+  messages    Message[]
+  experiences Experience[]
+}
+
+model Message {
+  id String @id @default(uuid())
+
+  instanceId String
+  instance   Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  role    MessageRole
+  content String      @db.Text
+
+  userRole UserRole?
+
+  docummentsUrls  String[] @default([])
+  docummentsPaths String[] @default([])
+
+  voiceUrls  String[] @default([])
+  voicePaths String[] @default([])
+
+  promptTokens     Int?
+  completionTokens Int?
+  totalTokens      Int?
+  model            String?
+
+  createdAt DateTime @default(now())
+
+  @@index([instanceId])
+}
+
+model Experience {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  agentId String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  instanceId String
+  instance   Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  userQuery  String
+  aiResponse String
+
+  content String @db.Text
+
+  promptTokens     Int?
+  completionTokens Int?
+  totalTokens      Int?
+  model            String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([agentId])
+  @@index([instanceId])
+  @@index([createdAt])
+}

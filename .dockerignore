@@ -1,0 +1,54 @@
+# =============================================================================
+# .dockerignore - Root Level
+# =============================================================================
+# Applies to all service builds unless overridden at service level
+
+**/.git
+**/.gitignore
+**/.DS_Store
+**/node_modules
+**/.next
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.venv
+**/venv
+**/.env
+**/.env.*
+!**/.env.example
+**/npm-debug.log
+**/yarn-debug.log
+**/yarn-error.log
+**/*.log
+
+# Test files
+**/tests
+**/__tests__
+**/*.test.js
+**/*.spec.js
+**/*.test.ts
+**/*.spec.ts
+**/coverage
+**/.nyc_output
+
+# Editor files
+**/.vscode
+**/.idea
+**/*.swp
+**/*.swo
+
+# Documentation (not needed in image)
+**/docs
+**/*.md
+**/CHANGELOG
+**/LICENSE
+
+# Docker files (not needed inside image)
+**/Dockerfile*
+**/docker-compose*
+**/.dockerignore
+
+# CI/CD
+**/.github
+**/.gitlab-ci.yml
